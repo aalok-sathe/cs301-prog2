@@ -1,0 +1,38 @@
+IDEAL: 
+RAW Dependence between instruction 1 add $3, $4, $8 and 3 mult $2, $3
+Instr# 	 CompletionTime 	 Mnemonic 
+0	5			|j label
+1	6			|add $3, $4, $8
+2	7			|addi $1, $2, 100
+3	8			|mult $2, $3
+4	9			|mfhi $1
+5	10			|sra $3, $2, 10
+6	11			|slti $1, $2, 1023
+7	12			|lw $1, 100($2)
+Total time is 12
+
+STALL: 
+RAW Dependence between instruction 1 add $3, $4, $8 and 3 mult $2, $3
+Instr# 	 CompletionTime 	 Mnemonic 
+0	5			|j label
+1	7			|add $3, $4, $8
+2	8			|addi $1, $2, 100
+3	10			|mult $2, $3
+4	11			|mfhi $1
+5	12			|sra $3, $2, 10
+6	13			|slti $1, $2, 1023
+7	14			|lw $1, 100($2)
+Total time is 14
+
+FORWARDING: 
+RAW Dependence between instruction 1 add $3, $4, $8 and 3 mult $2, $3
+Instr# 	 CompletionTime 	 Mnemonic 
+0	5			|j label
+1	7			|add $3, $4, $8
+2	8			|addi $1, $2, 100
+3	9			|mult $2, $3
+4	10			|mfhi $1
+5	11			|sra $3, $2, 10
+6	12			|slti $1, $2, 1023
+7	13			|lw $1, 100($2)
+Total time is 13

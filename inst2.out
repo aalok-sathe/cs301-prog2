@@ -1,0 +1,47 @@
+IDEAL: 
+RAW Dependence between instruction 1 lw $4, 0($1) and 2 add $3, $4, $8
+RAW Dependence between instruction 2 add $3, $4, $8 and 4 mult $2, $3
+RAW Dependence between instruction 6 sra $3, $2, 10 and 7 slti $1, $3, 1023
+Instr# 	 CompletionTime 	 Mnemonic 
+0	5			|j label
+1	6			|lw $4, 0($1)
+2	7			|add $3, $4, $8
+3	8			|addi $1, $2, 100
+4	9			|mult $2, $3
+5	10			|mfhi $1
+6	11			|sra $3, $2, 10
+7	12			|slti $1, $3, 1023
+8	13			|lw $1, 100($3)
+Total time is 13
+
+STALL: 
+RAW Dependence between instruction 1 lw $4, 0($1) and 2 add $3, $4, $8
+RAW Dependence between instruction 2 add $3, $4, $8 and 4 mult $2, $3
+RAW Dependence between instruction 6 sra $3, $2, 10 and 7 slti $1, $3, 1023
+Instr# 	 CompletionTime 	 Mnemonic 
+0	5			|j label
+1	7			|lw $4, 0($1)
+2	10			|add $3, $4, $8
+3	11			|addi $1, $2, 100
+4	13			|mult $2, $3
+5	14			|mfhi $1
+6	15			|sra $3, $2, 10
+7	18			|slti $1, $3, 1023
+8	19			|lw $1, 100($3)
+Total time is 19
+
+FORWARDING: 
+RAW Dependence between instruction 1 lw $4, 0($1) and 2 add $3, $4, $8
+RAW Dependence between instruction 2 add $3, $4, $8 and 4 mult $2, $3
+RAW Dependence between instruction 6 sra $3, $2, 10 and 7 slti $1, $3, 1023
+Instr# 	 CompletionTime 	 Mnemonic 
+0	5			|j label
+1	7			|lw $4, 0($1)
+2	9			|add $3, $4, $8
+3	10			|addi $1, $2, 100
+4	11			|mult $2, $3
+5	12			|mfhi $1
+6	13			|sra $3, $2, 10
+7	14			|slti $1, $3, 1023
+8	15			|lw $1, 100($3)
+Total time is 15
