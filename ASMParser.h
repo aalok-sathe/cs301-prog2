@@ -8,15 +8,19 @@ using namespace std;
 #include "Instruction.h"
 #include "RegisterTable.h"
 #include "OpcodeTable.h"
+#include <math.h>
 #include <vector>
 #include <sstream>
+#include <stdlib.h>
+#include <bitset>
+#include <stdexcept>
 
 /* This class reads in a MIPS assembly file and checks its syntax.  If
- * the file is syntactically correct, this class will retain a list 
+ * the file is syntactically correct, this class will retain a list
  * of Instructions (one for each instruction from the file).  This
  * list of Instructions can be iterated through.
  */
-   
+
 
 class ASMParser{
  public:
@@ -36,17 +40,23 @@ class ASMParser{
   int myIndex;                             // iterator index
   bool myFormatCorrect;
 
+  static const int REG_WIDTH = 5;
+  static const int J_ADDR_WIDTH = 26;
+  static const int IMM_WIDTH = 16;
+  static const int ARCH_NUM_BITS = 32;
+
   RegisterTable registers;                 // encodings for registers
   OpcodeTable opcodes;                     // encodings of opcodes
   int myLabelAddress;   // Used to assign labels addresses
 
-  // Decomposes a line of assembly code into strings for the opcode field and operands, 
+  // Decomposes a line of assembly code into strings for the opcode field and operands,
   // checking for syntax errors and counting the number of operands.
   void getTokens(string line, string &opcode, string *operand, int &num_operands);
 
-  // Given an Opcode, a string representing the operands, and the number of operands, 
+  // Given an Opcode, a string representing the operands, and the number of operands,
   // breaks operands apart and stores fields into Instruction.
   bool getOperands(Instruction &i, Opcode o, string *operand, int operand_count);
+
 
   // Returns true if character is white space
   bool isWhitespace(char c)    { return (c == ' '|| c == '\t'); };
@@ -65,7 +75,7 @@ class ASMParser{
 
   // Returns true if character is an alphabetic character
   bool isAlpha(char c)         {return (isAlphaUpper(c) || isAlphaLower(c)); };
-  
+
   // Returns true if s represents a valid decimal integer
   bool isNumberString(string s);
 
@@ -76,6 +86,19 @@ class ASMParser{
   // Given a valid instruction, returns a string representing the 32 bit MIPS binary encoding
   // of that instruction.
   string encode(Instruction i);
+
+  // Given a number and width, returns a width-wide binary representation of that number
+  // e.g., if width is 8, it would return an 8-bit binary representation
+  string convertToBinary(int number, int width);
+
+  // Given a valid I-type isntruction, returns the encoding of that instruction
+  string encodeIType(Instruction i);
+
+  // Given a valid J-type isntruction, returns the encoding of that instruction
+  string encodeJType(Instruction i);
+
+  // Given a valid R-type isntruction, returns the encoding of that instruction
+  string encodeRType(Instruction i);
 
 };
 

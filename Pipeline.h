@@ -2,6 +2,7 @@
 #define _PIPELINE_H_
 
 #include <string>
+#include <iostream>
 
 using namespace std;
 
@@ -53,6 +54,9 @@ class Pipeline{
    */
   bool isFormatCorrect();
 
+private:
+
+    bool myFormatCorrect;
 
 };
 

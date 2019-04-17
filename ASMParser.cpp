@@ -21,10 +21,6 @@ ASMParser::ASMParser(string filename)
       string operand[80];
       int operand_count = 0;
 
-      if(line.length() == 0){
-	continue;
-      }
-
       getTokens(line, opcode, operand, operand_count);
 
       if(opcode.length() == 0 && operand_count != 0){
@@ -33,14 +29,15 @@ ASMParser::ASMParser(string filename)
 	break;
       }
 
-      Opcode o = opcodes.getOpcode(opcode);      
+      Opcode o = opcodes.getOpcode(opcode);
+
       if(o == UNDEFINED){
 	// invalid opcode specified
 	myFormatCorrect = false;
 	break;
       }
 
-      bool success = getOperands(i, o, operand, operand_count);
+              bool success = getOperands(i, o, operand, operand_count);
       if(!success){
 	myFormatCorrect = false;
 	break;
@@ -49,7 +46,6 @@ ASMParser::ASMParser(string filename)
       string encoding = encode(i);
       i.setEncoding(encoding);
 
-      i.setAssembly(line);
       myInstructions.push_back(i);
 
     }
@@ -66,7 +62,7 @@ Instruction ASMParser::getNextInstruction()
     myIndex++;
     return myInstructions[myIndex-1];
   }
-  
+
   Instruction i;
   return i;
 
@@ -76,7 +72,7 @@ void ASMParser::getTokens(string line,
 			       string &opcode,
 			       string *operand,
 			       int &numOperands)
-  // Decomposes a line of assembly code into strings for the opcode field and operands, 
+  // Decomposes a line of assembly code into strings for the opcode field and operands,
   // checking for syntax errors and counting the number of operands.
 {
     // locate the start of a comment
@@ -125,23 +121,23 @@ void ASMParser::getTokens(string line,
       i++;
     }
 
-    
+
     idx = operand[numOperands-1].find('(');
     string::size_type idx2 = operand[numOperands-1].find(')');
-    
+
     if (idx == string::npos || idx2 == string::npos ||
 	((idx2 - idx) < 2 )){ // no () found
     }
     else{ // split string
       string offset = operand[numOperands-1].substr(0,idx);
       string regStr = operand[numOperands-1].substr(idx+1, idx2-idx-1);
-      
+
       operand[numOperands-1] = offset;
       operand[numOperands] = regStr;
       numOperands++;
     }
-    
-    
+
+
 
     // ignore anything after the whitespace after the operand
     // We could do a further look and generate an error message
@@ -159,7 +155,7 @@ bool ASMParser::isNumberString(string s)
 	// check remaining characters
 	for (int i=1; i < len; i++)
 	{
-	    if (!isdigit(s.at(i))) return false;
+	    if (!isDigit(s.at(i))) return false;
 	}
 	return true;
     }
@@ -194,11 +190,11 @@ int ASMParser::cvtNumString2Number(string s)
     }
     return val;
 }
-		
 
-bool ASMParser::getOperands(Instruction &i, Opcode o, 
+
+bool ASMParser::getOperands(Instruction &i, Opcode o,
 			    string *operand, int operand_count)
-  // Given an Opcode, a string representing the operands, and the number of operands, 
+  // Given an Opcode, a string representing the operands, and the number of operands,
   // breaks operands apart and stores fields into Instruction.
 {
 
@@ -226,7 +222,7 @@ bool ASMParser::getOperands(Instruction &i, Opcode o,
       return false;
 
   }
-  
+
   if(rd_p != -1){
     rd = registers.getNum(operand[rd_p]);
     if(rd == NumRegisters)
@@ -237,14 +233,11 @@ bool ASMParser::getOperands(Instruction &i, Opcode o,
   if(imm_p != -1){
     if(isNumberString(operand[imm_p])){  // does it have a numeric immediate field?
       imm = cvtNumString2Number(operand[imm_p]);
-      if(imm > 0 && ((imm & 0xFFFF0000)<<1)){  // too big a number to fit
+      //      if(((abs(imm) & 0xFFFF0000)<<1))  // too big a number to fit
+      if(abs(imm) > pow(2, 16)) // too big a number to fit
 	return false;
-      }
-      else if(imm < 0 && ((imm ^ 0xFFFF0000) >> 16)){
-	return false;
-      }
     }
-    else{ 
+    else{
       if(opcodes.isIMMLabel(o)){  // Can the operand be a label?
 	// Assign the immediate field an address
 	imm = myLabelAddress;
@@ -266,7 +259,142 @@ string ASMParser::encode(Instruction i)
   // Given a valid instruction, returns a string representing the 32 bit MIPS binary encoding
   // of that instruction.
 {
-  // Your code here
-  return "";
+  if(opcodes.getInstType(i.getOpcode()) == RTYPE)
+  {
+    // encode and return an R-type instruction
+    return encodeRType(i);
+  }
+  else if(opcodes.getInstType(i.getOpcode())  == ITYPE)
+  {
+    // encode and return an I-type instruction
+    return encodeIType(i);
+  }
+  else
+  {
+    // encode and return a J-type instruction
+    return encodeJType(i);
+  }
 }
 
+
+// private helper method to encode only R-type isntructions
+string ASMParser::encodeRType(Instruction i)
+{
+    // start with an empty string as the base
+    string translation = "";
+
+    // the first field is always the opcode; which we already
+    // have as a string in the instruction object
+    translation += opcodes.getOpcodeField(i.getOpcode());
+
+    Opcode this_opcode = i.getOpcode();
+    int posns[4] = {opcodes.RSposition(this_opcode),
+                    opcodes.RTposition(this_opcode),
+                    opcodes.RDposition(this_opcode),
+                    opcodes.IMMposition(this_opcode)};
+    int fields[4] = {i.getRS(), i.getRT(), i.getRD(), i.getImmediate()};
+
+    // goes through each position in posns and processes the part of
+    // the instruction contributed to the entire instruction by that
+    // position
+    for(int i = 0; i < 4; i++)
+    {
+        // if posn is not used, set to all 0s
+        if (posns[i] == -1)
+            fields[i] = 0;
+
+        // get binary representation according to the instruction type
+        translation += convertToBinary(fields[i], REG_WIDTH);
+    }
+
+    // funct field comes last
+    translation += opcodes.getFunctField(this_opcode);
+
+    return translation;
+}
+
+
+// private helper method to only encode I type instructions
+string ASMParser::encodeIType(Instruction i)
+{
+    // start with a base empty string
+    string translation = "";
+
+    // the first field is always the opcode; which we already
+    // have as a string in the instruction object
+    translation += opcodes.getOpcodeField(i.getOpcode());
+
+    Opcode this_opcode = i.getOpcode();
+    int posns[3] = {opcodes.RSposition(this_opcode),
+                    opcodes.RTposition(this_opcode),
+                    opcodes.IMMposition(this_opcode)};
+    int fields[3] = {i.getRS(), i.getRT(), i.getImmediate()};
+
+    // goes through each position in posns and processes the part of
+    // the instruction contributed to the entire instruction by that
+    // position
+    for(int i = 0; i < 3; i++)
+    {
+        // if posn is not used, set to all 0s
+        if (posns[i] == -1)
+            fields[i] = 0;
+
+        if(i < 2)
+            // get binary representation according to the instruction type
+            translation += convertToBinary(fields[i], REG_WIDTH);
+        else
+            // get binary representation according to the instruction type
+            translation += convertToBinary(fields[i], IMM_WIDTH);
+    }
+
+    return translation;
+}
+
+
+// private helper method to encode only J type instructions
+string ASMParser::encodeJType(Instruction i)
+{
+    // start with an empty string
+    string translation = "";
+
+    // the first field is always the opcode; which we already
+    // have as a string in the instruction object
+    translation += opcodes.getOpcodeField(i.getOpcode());
+
+    // opcode of the instruction
+    Opcode this_opcode = i.getOpcode();
+
+    // define 'posns' and 'fields' array to store operand positions
+    // and their corresponding values, respectively, for ease of use
+    // in a for-loop
+    int posns[1] = {opcodes.IMMposition(this_opcode)};
+    int fields[1] = {i.getImmediate()};
+
+    // goes through each position in posns and processes the part of
+    // the instruction contributed to the entire instruction by that
+    // position
+    for(int i = 0; i < 1; i++)
+    {
+        // if posn is not used, set to all 0s
+        if (posns[i] == -1)
+            fields[i] = 0;
+
+        // get binary representation according to the instruction type
+        translation += convertToBinary(fields[i]/4, J_ADDR_WIDTH);
+    }
+
+    translation += opcodes.getFunctField(this_opcode);
+
+    return translation;
+}
+
+
+// private helper method that converts a passed integer to binary
+// to a maximum width of whatever number of bits the architecture
+// has (default: 32). truncates the converted string to the 'width'
+// least significant bits and returns
+string ASMParser::convertToBinary(int number, int width)
+{
+    string str = std::bitset<ARCH_NUM_BITS>(number).to_string();
+    return str.substr(ARCH_NUM_BITS-width, width);
+}

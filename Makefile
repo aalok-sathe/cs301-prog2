@@ -12,14 +12,13 @@ CFLAGS = -DDEBUG -g -Wall
 
 
 PIPESIM: Pipesim.o Pipeline.o DataForwardPipeline.o StallPipeline.o DependencyChecker.o Instruction.o OpcodeTable.o RegisterTable.o ASMParser.o
-	g++ -o PIPESIM DependencyChecker.o OpcodeTable.o ASMParser.o RegisterTable.o Instruction.o
-
-#DCHECKER: Depend.o DependencyChecker.o Instruction.o OpcodeTable.o RegisterTable.o ASMParser.o
-#	g++ -o DCHECKER Depend.o DependencyChecker.o OpcodeTable.o ASMParser.o RegisterTable.o Instruction.o
+	g++ -o PIPESIM Pipesim.o Pipeline.o DataForwardPipeline.o StallPipeline.o DependencyChecker.o Instruction.o OpcodeTable.o RegisterTable.o ASMParser.o MachLangParser.o
 
 DependencyChecker.o: DependencyChecker.h OpcodeTable.h RegisterTable.h Instruction.h
 
 ASMParser.o: ASMParser.h OpcodeTable.h RegisterTable.h Instruction.h
+
+MachLangParser.o:
 
 Instruction.o: OpcodeTable.h RegisterTable.h Instruction.h
 
