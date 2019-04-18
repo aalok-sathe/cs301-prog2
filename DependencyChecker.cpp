@@ -12,7 +12,7 @@ DependencyChecker::DependencyChecker(int numRegisters)
     myCurrentState.insert(make_pair(i, r));
   }
 
-  myCurrentInstr = 0; // start with current instr no. = 0
+  // myCurrentInstr = 0; // start with current instr no. = 0
 }
 
 void DependencyChecker::addInstruction(Instruction i)
@@ -70,7 +70,7 @@ void DependencyChecker::addInstruction(Instruction i)
   }
 
   myInstructions.push_back(i);
-  myCurrentInstr++;
+  // myCurrentInstr++;
 
 }
 
@@ -85,6 +85,8 @@ void DependencyChecker::checkForReadDependence(unsigned int reg)
   RegisterInfo reginfo = myCurrentState[reg];
   AccessType atype = reginfo.accessType;
 
+  int instTracker = myDependences.size(); // TODO
+
   // if access type was WRITE then we have some kind of dependence,
   // because we don't care about RAR
   if (atype == WRITE)
@@ -93,7 +95,7 @@ void DependencyChecker::checkForReadDependence(unsigned int reg)
     Dependence d;
     d.registerNumber = reg;
     d.previousInstructionNumber = reginfo.lastInstructionToAccess;
-    d.currentInstructionNumber = myCurrentInstr;
+    d.currentInstructionNumber = instTracker;
     d.dependenceType = RAW;
 
     // store the detected dependence
@@ -102,7 +104,7 @@ void DependencyChecker::checkForReadDependence(unsigned int reg)
 
   // update most recent access of this register
   reginfo.accessType = READ;
-  reginfo.lastInstructionToAccess = myCurrentInstr;
+  reginfo.lastInstructionToAccess = instTracker;
   myCurrentState[reg] = reginfo;
 }
 
@@ -117,6 +119,8 @@ void DependencyChecker::checkForWriteDependence(unsigned int reg)
     RegisterInfo reginfo = myCurrentState[reg];
     AccessType atype = reginfo.accessType;
 
+    int instTracker = myDependences.size(); // TODO
+
     // if access type was either READ or WRITE (some access, not A_UNDEFINED),
     // then we have some kind of dependence
     if (atype == WRITE or atype == READ)
@@ -125,7 +129,7 @@ void DependencyChecker::checkForWriteDependence(unsigned int reg)
       Dependence d;
       d.registerNumber = reg;
       d.previousInstructionNumber = reginfo.lastInstructionToAccess;
-      d.currentInstructionNumber = myCurrentInstr;
+      d.currentInstructionNumber = instTracker;
       // if previous atype is READ, it is an WAR dependence otherwise WAW
       d.dependenceType = (atype == READ) ? WAR : WAW;
 
@@ -134,7 +138,7 @@ void DependencyChecker::checkForWriteDependence(unsigned int reg)
 
     // update most recent access of this register
     reginfo.accessType = WRITE;
-    reginfo.lastInstructionToAccess = myCurrentInstr;
+    reginfo.lastInstructionToAccess = instTracker;
     myCurrentState[reg] = reginfo;
 }
 
@@ -145,11 +149,11 @@ void DependencyChecker::printDependences()
    */
 {
   // First, print all instructions
-  list<Instruction>::iterator liter;
+  vector<Instruction>::iterator viter;
   int i = 0;
   cout << "INSTRUCTIONS:" << endl;
-  for(liter = myInstructions.begin(); liter != myInstructions.end(); liter++){
-    cout << i << ": " << (*liter).getAssembly() << endl;
+  for(viter = myInstructions.begin(); viter != myInstructions.end(); viter++){
+    cout << i << ": " << (*viter).getAssembly() << endl;
     i++;
   }
 
@@ -176,5 +180,52 @@ void DependencyChecker::printDependences()
     cout << (*diter).currentInstructionNumber << ")" << endl;
   }
 
+}
+
+
+vector<string> DependencyChecker::getStringDependences(DependenceType depType)
+    /*
+     *
+     */
+{
+    vector<string> lines;
+
+    // Second, print all dependences
+    list<Dependence>::iterator diter;
+    for(diter = myDependences.begin(); diter != myDependences.end(); diter++)
+    {
+      stringstream ss;
+      switch((*diter).dependenceType)
+      {
+          case RAW:
+            if (depType != RAW)
+                continue;
+            ss << "RAW Dependence between instruction ";
+            break;
+          case WAR:
+            if (depType != WAR)
+                continue;
+            ss << "WAR Dependence between instruction ";
+            break;
+          case WAW:
+            if (depType != WAW)
+                continue;
+            ss << "WAW Dependence between instruction ";
+            break;
+          default:
+            break;
+      }
+
+      int prev = (*diter).previousInstructionNumber;
+      ss << myInstructions.at(prev).getAssembly() << " and ";
+      int curr = (*diter).currentInstructionNumber;
+      ss << myInstructions.at(curr).getAssembly();
+
+      cout << "DEBUG: dependence line: " << ss.str() << endl;
+      lines.push_back(ss.str());
+
+    }
+
+    return lines;
 
 }

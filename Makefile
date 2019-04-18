@@ -11,14 +11,14 @@ CFLAGS = -DDEBUG -g -Wall
 	g++ $(CFLAGS) -c $<
 
 
-PIPESIM: Pipesim.o Pipeline.o DataForwardPipeline.o StallPipeline.o DependencyChecker.o Instruction.o OpcodeTable.o RegisterTable.o ASMParser.o
+PIPESIM: Pipesim.o Pipeline.o DataForwardPipeline.o StallPipeline.o DependencyChecker.o Instruction.o OpcodeTable.o RegisterTable.o ASMParser.o MachLangParser.o
 	g++ -o PIPESIM Pipesim.o Pipeline.o DataForwardPipeline.o StallPipeline.o DependencyChecker.o Instruction.o OpcodeTable.o RegisterTable.o ASMParser.o MachLangParser.o
 
 DependencyChecker.o: DependencyChecker.h OpcodeTable.h RegisterTable.h Instruction.h
 
 ASMParser.o: ASMParser.h OpcodeTable.h RegisterTable.h Instruction.h
 
-MachLangParser.o:
+MachLangParser.o: MachLangParser.h OpcodeTable.h RegisterTable.h Instruction.h
 
 Instruction.o: OpcodeTable.h RegisterTable.h Instruction.h
 
@@ -31,6 +31,9 @@ Pipeline.o: Pipeline.h
 StallPipeline.o: StallPipeline.h
 
 DataForwardPipeline.o: DataForwardPipeline.h
+
+exec: PIPESIM
+	./PIPESIM inst.asm
 
 test: clean PIPESIM
 	./PIPESIM inst.asm | diff -y inst.out -

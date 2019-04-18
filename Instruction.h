@@ -46,7 +46,7 @@ class Instruction{
   // Returns the value of the instruction's immediate field
   int getImmediate()   { return myImmediate; };
 
-  // Returns the type of instruction 
+  // Returns the type of instruction
   InstType getInstType();
 
   // Sets the assembly representation of the instruction to the specified parameter
@@ -56,7 +56,7 @@ class Instruction{
   string getAssembly() { return myAssembly;};
 
   // Stores the 32 bit binary encoding of MIPS instruction passed in
-  void setEncoding(string s) { myEncoding = s;};
+  void setEncoding(string s) { myEncoding = s; };
 
   // Returns string representing the 32 binary encoding of MIPS instruction
   string getEncoding() {return myEncoding; };

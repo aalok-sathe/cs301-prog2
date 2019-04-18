@@ -1,10 +1,14 @@
 #ifndef _PIPELINE_H_
 #define _PIPELINE_H_
 
+using namespace std;
+
 #include <string>
 #include <iostream>
-
-using namespace std;
+#include <vector>
+#include "ASMParser.h"
+#include "MachLangParser.h"
+#include "DependencyChecker.h"
 
 /* The stages in the pipeline in the order they appear in the datapath */
 enum PipelineStages{
@@ -56,7 +60,10 @@ class Pipeline{
 
 private:
 
+    OpcodeTable opcodes;
     bool myFormatCorrect;
+    vector<Instruction> myInstructions;
+    DependencyChecker myDependencies;
 
 };
 

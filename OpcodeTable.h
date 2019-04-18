@@ -29,15 +29,16 @@ enum Opcode{
 enum InstType{
   RTYPE,
   ITYPE,
-  JTYPE
+  JTYPE,
+  INVALID
 };
 
 
 // Different types of MIPS instructions based on their function
 enum InstFunc{
-    ARITHM,
-    MEMORY,
-    CONTROL
+    ARITHM_I,
+    MEMORY_I,
+    CONTROL_I
 };
 
 
@@ -134,7 +135,7 @@ class OpcodeTable
                 numOps = 0;
                 rdPos = rsPos = rtPos = immPos = -1;
                 immLabel = false;
-                instFunc = ARITHM; // basic kind of instruction function
+                instFunc = ARITHM_I; // basic kind of instruction function
             };
         };
 

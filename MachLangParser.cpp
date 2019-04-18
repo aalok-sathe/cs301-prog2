@@ -363,7 +363,7 @@ string MachLangParser::assembleIType(Instruction i)
     Opcode opc = i.getOpcode();
 
     // case: if instruction is arithmetic-function
-    if (opcodes.getInstFunc(opc) == ARITHM)
+    if (opcodes.getInstFunc(opc) == ARITHM_I)
     {
         // go through each operand position and add only if the
         // operand's position matches the current position being
@@ -385,7 +385,7 @@ string MachLangParser::assembleIType(Instruction i)
         }
     }
     // case: if instruction is memory-function
-    else if (opcodes.getInstFunc(opc) == MEMORY)
+    else if (opcodes.getInstFunc(opc) == MEMORY_I)
     {
         for (int it = 0; it < opcodes.numOperands(opc); it++)
         {
@@ -398,7 +398,7 @@ string MachLangParser::assembleIType(Instruction i)
         }
     }
     // case: if instruction is flow control-function
-    else if (opcodes.getInstFunc(opc) == CONTROL)
+    else if (opcodes.getInstFunc(opc) == CONTROL_I)
     {
         for (int it = 0; it < opcodes.numOperands(opc); it++)
         {

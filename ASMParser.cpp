@@ -43,6 +43,7 @@ ASMParser::ASMParser(string filename)
 	break;
       }
 
+      i.setAssembly(line);
       string encoding = encode(i);
       i.setEncoding(encoding);
 

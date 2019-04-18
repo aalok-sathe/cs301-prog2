@@ -99,7 +99,7 @@ OpcodeTable::OpcodeTable()
     myArray[LW].rtPos = 0;
     myArray[LW].immPos = 1;
     myArray[LW].instType = ITYPE;
-    myArray[LW].instFunc = MEMORY;
+    myArray[LW].instFunc = MEMORY_I;
     myArray[LW].op_field = "100011";
     myArray[LW].funct_field = "";
 
@@ -112,7 +112,7 @@ OpcodeTable::OpcodeTable()
     myArray[J].immPos = 0;
     myArray[J].immLabel = true;
     myArray[J].instType = JTYPE;
-    myArray[J].instFunc = CONTROL;
+    myArray[J].instFunc = CONTROL_I;
     myArray[J].op_field = "000010";
     myArray[J].funct_field = "";
 
@@ -125,7 +125,7 @@ OpcodeTable::OpcodeTable()
     myArray[BEQ].immPos = 2;
     myArray[BEQ].immLabel = true;
     myArray[BEQ].instType = ITYPE;
-    myArray[BEQ].instFunc = CONTROL;
+    myArray[BEQ].instFunc = CONTROL_I;
     myArray[BEQ].op_field = "000100";
     myArray[BEQ].funct_field = "";
 

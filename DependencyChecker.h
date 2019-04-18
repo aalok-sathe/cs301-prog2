@@ -1,14 +1,17 @@
 #ifndef __DEPENDENCYCHECKER_H__
 #define __DEPENDENCYCHECKER_H__
 
+using namespace std;
+
 #include <iostream>
 #include <map>
 #include <list>
-
-using namespace std;
-
+#include <string>
+#include <sstream>
+#include <vector>
 #include "Instruction.h"
 #include "OpcodeTable.h"
+
 
 /*
  * The DependencyChecker class finds all of the data dependencies (RAW, WAR, WAW)
@@ -82,6 +85,10 @@ class DependencyChecker {
    */
   void printDependences();
 
+  // TODO
+  vector<string> getStringDependences(DependenceType depType);
+
+
  private:
   /* Determines if a read data dependence occurs when reg is read by the current
    * instruction.  If so, adds an entry to the list of dependences. Also updates
@@ -97,10 +104,10 @@ class DependencyChecker {
 
   map<unsigned int, RegisterInfo> myCurrentState;
   list<Dependence> myDependences;
-  list<Instruction> myInstructions;
+  vector<Instruction> myInstructions;
   OpcodeTable myOpcodeTable;
 
-  int myCurrentInstr; // private variable to keep track of instruction
+  // int myCurrentInstr; // private variable to keep track of instruction
                       // number of current instruction being checked
 };
 

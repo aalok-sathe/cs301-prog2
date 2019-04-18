@@ -1,12 +1,15 @@
 #ifndef __MACHLANGPARSER_H__
 #define __MACHLANGPARSER_H__
 
+using namespace std;
+
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <sstream>
 #include <stdlib.h>
 #include <bitset>
+#include "Parser.h"
 #include "Instruction.h"
 #include "RegisterTable.h"
 #include "OpcodeTable.h"
@@ -29,7 +32,7 @@ enum SignFlag{
  * language instruction from the file).  This list of Instructions
  * can be iterated through.
  */
-class MachLangParser{
+class MachLangParser : public Parser{
  public:
 
   // Specify a text file containing machine language/binary representations

@@ -5,6 +5,7 @@ using namespace std;
 
 #include <iostream>
 #include <fstream>
+#include "Parser.h"
 #include "Instruction.h"
 #include "RegisterTable.h"
 #include "OpcodeTable.h"
@@ -22,7 +23,7 @@ using namespace std;
  */
 
 
-class ASMParser{
+class ASMParser : public Parser{
  public:
   // Specify a text file containing MIPS assembly instructions. Function
   // checks syntactic correctness of file and creates a list of Instructions.
