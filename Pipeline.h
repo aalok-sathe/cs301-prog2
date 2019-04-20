@@ -10,6 +10,8 @@ using namespace std;
 #include "MachLangParser.h"
 #include "DependencyChecker.h"
 
+
+
 /* The stages in the pipeline in the order they appear in the datapath */
 enum PipelineStages{
   FETCH,
@@ -19,6 +21,20 @@ enum PipelineStages{
   WRITEBACK,
   NUM_STAGES
 };
+
+
+struct ValueSchedule
+{
+    PipelineStages required;
+    PipelineStages produced;
+
+    ValueSchedule(PipelineStages r, PipelineStages p)
+    {
+        required = r;
+        produced = p;
+    }
+};
+
 
 /* This class simulates an ideal pipeline, executing the instructions
  * from an input file on an ideal pipeline and printing out information
@@ -56,15 +72,43 @@ class Pipeline{
   /* Returns true if the input file was syntactically correct and only
    * contained supported instructions.  Otherwise, returns false.
    */
-  bool isFormatCorrect();
+  bool isFormatCorrect() { return myFormatCorrect; };
 
-private:
+
+ protected:
+   
+    /*
+     */ 
+    int getDelay(Instruction i) { return 0; }; 
+    DependencyChecker myDependencyChecker;
+    int myTime;
+
+    struct outputStruct
+    {
+        string dependencies;
+        string columnHeaders;
+        vector<string> instrLines;
+        string footer;
+        string myPipelineType;
+        
+        outputStruct()
+        {
+            columnHeaders = "Instr#   CompletionTime          Mnemonic";
+            footer = "Total time is ";
+        }
+
+    } myOutput;
 
     OpcodeTable opcodes;
     bool myFormatCorrect;
     vector<Instruction> myInstructions;
-    DependencyChecker myDependencies;
+    vector<int> myCompletionTimes;
 
+    map<InstFunc, ValueSchedule> myDataSchedule;
+
+ private:
+
+    
 };
 
 #endif

@@ -20,6 +20,8 @@ class Parser{
 
   Parser() {};
 
+  virtual ~Parser() {};
+
   // Specify a text file containing MIPS assembly instructions. Function
   // checks syntactic correctness of file and creates a list of Instructions.
   Parser(string filename) {};

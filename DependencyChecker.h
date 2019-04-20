@@ -106,6 +106,7 @@ class DependencyChecker {
   list<Dependence> myDependences;
   vector<Instruction> myInstructions;
   OpcodeTable myOpcodeTable;
+  map<int, list<Dependence> > myDependenceMap;
 
   // int myCurrentInstr; // private variable to keep track of instruction
                       // number of current instruction being checked

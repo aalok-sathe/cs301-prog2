@@ -16,9 +16,9 @@ PIPESIM: Pipesim.o Pipeline.o DataForwardPipeline.o StallPipeline.o DependencyCh
 
 DependencyChecker.o: DependencyChecker.h OpcodeTable.h RegisterTable.h Instruction.h
 
-ASMParser.o: ASMParser.h OpcodeTable.h RegisterTable.h Instruction.h
+ASMParser.o: Parser.h ASMParser.h OpcodeTable.h RegisterTable.h Instruction.h
 
-MachLangParser.o: MachLangParser.h OpcodeTable.h RegisterTable.h Instruction.h
+MachLangParser.o: Parser.h MachLangParser.h OpcodeTable.h RegisterTable.h Instruction.h
 
 Instruction.o: OpcodeTable.h RegisterTable.h Instruction.h
 

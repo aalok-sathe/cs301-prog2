@@ -70,7 +70,6 @@ void DependencyChecker::addInstruction(Instruction i)
   }
 
   myInstructions.push_back(i);
-  // myCurrentInstr++;
 
 }
 
@@ -85,8 +84,6 @@ void DependencyChecker::checkForReadDependence(unsigned int reg)
   RegisterInfo reginfo = myCurrentState[reg];
   AccessType atype = reginfo.accessType;
 
-  int instTracker = myDependences.size(); // TODO
-
   // if access type was WRITE then we have some kind of dependence,
   // because we don't care about RAR
   if (atype == WRITE)
@@ -95,17 +92,29 @@ void DependencyChecker::checkForReadDependence(unsigned int reg)
     Dependence d;
     d.registerNumber = reg;
     d.previousInstructionNumber = reginfo.lastInstructionToAccess;
-    d.currentInstructionNumber = instTracker;
+    d.currentInstructionNumber = myInstructions.size();
     d.dependenceType = RAW;
 
     // store the detected dependence
     myDependences.push_back(d);
+    
+    map<int, list<Dependence> >::iterator deps = myDependenceMap.find(myInstructions.size());
+    if (deps == myDependenceMap.end())
+    {
+      list<Dependence> l;
+      l.push_back(d);
+      myDependenceMap.insert(make_pair(myInstructions.size(), l));
+    }
+    else
+      deps->second.push_back(d);
+ 
   }
 
   // update most recent access of this register
   reginfo.accessType = READ;
-  reginfo.lastInstructionToAccess = instTracker;
+  reginfo.lastInstructionToAccess = myInstructions.size();
   myCurrentState[reg] = reginfo;
+  
 }
 
 
@@ -119,8 +128,6 @@ void DependencyChecker::checkForWriteDependence(unsigned int reg)
     RegisterInfo reginfo = myCurrentState[reg];
     AccessType atype = reginfo.accessType;
 
-    int instTracker = myDependences.size(); // TODO
-
     // if access type was either READ or WRITE (some access, not A_UNDEFINED),
     // then we have some kind of dependence
     if (atype == WRITE or atype == READ)
@@ -129,16 +136,27 @@ void DependencyChecker::checkForWriteDependence(unsigned int reg)
       Dependence d;
       d.registerNumber = reg;
       d.previousInstructionNumber = reginfo.lastInstructionToAccess;
-      d.currentInstructionNumber = instTracker;
+      d.currentInstructionNumber = myInstructions.size();
       // if previous atype is READ, it is an WAR dependence otherwise WAW
       d.dependenceType = (atype == READ) ? WAR : WAW;
 
       myDependences.push_back(d);
+   
+      map<int, list<Dependence> >::iterator deps = myDependenceMap.find(myInstructions.size());
+      if (deps == myDependenceMap.end())
+      {
+        list<Dependence> l;
+        l.push_back(d);
+        myDependenceMap.insert(make_pair(myInstructions.size(), l));
+      }
+      else
+        deps->second.push_back(d);
     }
 
+    
     // update most recent access of this register
     reginfo.accessType = WRITE;
-    reginfo.lastInstructionToAccess = instTracker;
+    reginfo.lastInstructionToAccess = myInstructions.size();
     myCurrentState[reg] = reginfo;
 }
 
@@ -217,11 +235,12 @@ vector<string> DependencyChecker::getStringDependences(DependenceType depType)
       }
 
       int prev = (*diter).previousInstructionNumber;
-      ss << myInstructions.at(prev).getAssembly() << " and ";
+      ss << prev << ' '
+         << myInstructions.at(prev).getAssembly() << " and ";
       int curr = (*diter).currentInstructionNumber;
-      ss << myInstructions.at(curr).getAssembly();
+      ss << curr << ' '
+         << myInstructions.at(curr).getAssembly();
 
-      cout << "DEBUG: dependence line: " << ss.str() << endl;
       lines.push_back(ss.str());
 
     }
