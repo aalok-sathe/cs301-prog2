@@ -4,7 +4,6 @@
 #include "Pipeline.h"
 
 /* The stages in the pipeline in the order they appear in the datapath */
-// TODO
 // enum StallPipelineStages{
 //   FETCH,
 //   DECODE,
@@ -39,9 +38,17 @@ class StallPipeline: public Pipeline{
    */
   void execute();
 
- protected:
 
+ protected:
+ 
+ /* Given the index of an instruction, i, computes and returns the
+  * delay in number of additional stall cycles that instruction will encounter
+  * according to the current model.
+  */
   int getDelay(int i);
+
+
+ private:
 
 };
 

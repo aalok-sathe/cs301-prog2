@@ -3,7 +3,11 @@
 
 Pipeline::Pipeline(string inputFile)
     : myDependencyChecker()
-// TODO
+/* Default constructor for the Pipeline class. Given an input string for
+ * a filename, calls an appropriate parser instance on the file (according
+ * to file extension), and processes the instructions in the file by simulating
+ * each one's execution in the CPU
+ */
 {
     myTime = NUM_STAGES;
     myFormatCorrect = false;
@@ -48,6 +52,9 @@ void Pipeline::execute()
  * storing that information for later printing.
  */
 {
+    // iterate through instructions, one after another,
+    // and simulate the execution of each instruction. store the completion
+    // time for each instruction in a container for later use
     for (unsigned int i=0; i<myInstructions.size(); i++)
     {
         myCompletionTimes.push_back(myTime + getDelay(i));
