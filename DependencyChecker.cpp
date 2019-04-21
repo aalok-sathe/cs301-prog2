@@ -202,17 +202,23 @@ void DependencyChecker::printDependences()
 
 
 vector<string> DependencyChecker::getStringDependences(DependenceType depType)
-    /*
-     *
-     */
+ /* Returns a vector of strings of dependences all of a certain kind (depType).
+  * Useful for if a program wants to use this class to find out and report
+  * dependences, without providing it direct access to the internal data
+  * representation.
+  */
 {
+    // initialize a vector of lines with a dependency each to return
     vector<string> lines;
 
-    // Second, print all dependences
+    // scan and accumulate all dependences of required type
     list<Dependence>::iterator diter;
     for(diter = myDependences.begin(); diter != myDependences.end(); diter++)
     {
+      // a stringstream to hold the output formatting of the line
       stringstream ss;
+      
+      // only report dependences of the type requested
       switch((*diter).dependenceType)
       {
           case RAW:
@@ -234,11 +240,12 @@ vector<string> DependencyChecker::getStringDependences(DependenceType depType)
             break;
       }
 
+      // add the literal instruction encoding to the output
       int prev = (*diter).previousInstructionNumber;
-      ss << prev << ' '
-         << myInstructions.at(prev).getAssembly() << " and ";
       int curr = (*diter).currentInstructionNumber;
-      ss << curr << ' '
+      ss << prev << ' '
+         << myInstructions.at(prev).getAssembly() << " and "
+         << curr << ' '
          << myInstructions.at(curr).getAssembly();
 
       lines.push_back(ss.str());
@@ -246,25 +253,32 @@ vector<string> DependencyChecker::getStringDependences(DependenceType depType)
     }
 
     return lines;
-
 }
 
 
 int DependencyChecker::getPrevDep(int i, DependenceType depType)
-// TODO
+/* Given an index of an instruction, returns the index of the most recent
+  * instruction, if any, that had a dependence of depType with it. Returns
+  * -1 otherwise.
+  */
 {
+    // retrieve the list of dependenes of instruction at i
     list<Dependence> deps = myDependenceMap[i];
     list<Dependence>::iterator it;
-    bool found = false;
+    bool found = false; // flag because depType dependence might not exist
+
+    // find the depType dependence, if any, and exit
     for (it = deps.begin(); it != deps.end(); it++) 
         if (it->dependenceType == depType)
         {
             found = true;
             break;
         }
- 
+
+    // return index of instruction that instruction at i has a dep with 
     if (found)
         return it->previousInstructionNumber;
 
+    // no dependence of queried type exists
     return -1;
 }

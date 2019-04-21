@@ -19,28 +19,23 @@ int DataForwardPipeline::getDelay(int i)
     InstFunc curFunc = opcodes.getInstFunc(curInst.getOpcode());
     PipelineStages reqd = myDataSchedule[curFunc].required;
 
+    if (curFunc == CONTROL_I)
+       myTime++; 
     
     int prev = myDependencyChecker.getPrevDep(i, RAW);
     if (prev>0)
     {
-        //cout << "PREV: " << prev << " CURR: " << i << endl;
-        
         Instruction depInst = myInstructions.at(prev);
         InstFunc depFunc = opcodes.getInstFunc(depInst.getOpcode());
         PipelineStages prod = myDataSchedule[depFunc].produced;
 
-
-        //cout << "PROD: " << prod << " REQD: " << reqd << endl << endl;
-
         if ((int)reqd > (int)prod)
             return 0;
 
-        //return (NUM_STAGES-1) - reqd - (i - prev);
+        // the amount of time to wait till the data forwarding machinery
+        // can line up
         return prod - reqd;
-
     }
-    if (curFunc == CONTROL_I)
-       myTime++; 
-
+    
     return 0;
 }

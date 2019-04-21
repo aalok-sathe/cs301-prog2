@@ -26,7 +26,7 @@ ASMParser::ASMParser(string filename)
       if(opcode.length() == 0 && operand_count != 0){
 	// No opcode but operands
 	myFormatCorrect = false;
-	break;
+    break;
       }
 
       Opcode o = opcodes.getOpcode(opcode);

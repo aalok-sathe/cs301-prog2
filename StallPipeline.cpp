@@ -19,6 +19,8 @@ int StallPipeline::getDelay(int i)
     InstFunc curFunc = opcodes.getInstFunc(curInst.getOpcode());
     PipelineStages reqd = myDataSchedule[curFunc].required;
 
+    if (curFunc == CONTROL_I)
+       myTime++; 
     
     int prev = myDependencyChecker.getPrevDep(i, RAW);
     if (prev>0)
@@ -35,11 +37,11 @@ int StallPipeline::getDelay(int i)
         if ((int)reqd > (int)prod)
             return 0;
 
+        // additional stages remaning, minus the time available between
+        // the previous instruction and this one to have advanced any more
         return (NUM_STAGES-1) - reqd - (i - prev);
 
     }
-    if (curFunc == CONTROL_I)
-       myTime++; 
-
+    
     return 0;
 }

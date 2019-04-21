@@ -45,3 +45,4 @@ Instr# 	 CompletionTime 	 Mnemonic
 7	14			|slti $1, $3, 1023
 8	15			|lw $1, 100($3)
 Total time is 15
+

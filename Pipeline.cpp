@@ -9,7 +9,6 @@ Pipeline::Pipeline(string inputFile)
     myFormatCorrect = false;
     myOutput.myPipelineType = "IDEAL";
    
-     
 
     Parser* parser;
     string ext = inputFile.substr(inputFile.find_last_of('.')+1);
@@ -38,24 +37,31 @@ Pipeline::Pipeline(string inputFile)
 
 
 Pipeline::~Pipeline()
-// TODO
+// Deconstructor for Pipeline class
 {}
 
 
 void Pipeline::execute()
-// TODO
+/* Executes the instructions passed into the constructor.  The method
+ * determines the dependences and calculates the completion time of each
+ * instruction and the overall execution time for the set of instructions,
+ * storing that information for later printing.
+ */
 {
     for (unsigned int i=0; i<myInstructions.size(); i++)
     {
-        myCompletionTimes.push_back((myTime++) + getDelay(i));
-        if (myTime <= myCompletionTimes.back())
+        myCompletionTimes.push_back(myTime + getDelay(i));
+        if (++myTime <= myCompletionTimes.back())
             myTime = myCompletionTimes.back() + 1;
     }
 }
 
 
 void Pipeline::print()
-// TODO
+/* Prints the pipeline time, prints the RAW dependences found in the
+ * instructions, prints each instruction with its completion time, and
+ * prints the total execution time.
+ */
 {
     // print out the type of pipeline
     cout << myOutput.myPipelineType << ": " << endl;
@@ -76,6 +82,6 @@ void Pipeline::print()
         cout << i++ << "\t" << *(citer++) << "\t\t\t|"
              << (iiter++)->getAssembly() << endl;
 
-    cout << myOutput.footer << --myTime << endl << endl;
+    cout << myOutput.footer << myCompletionTimes.back() << endl << endl;
 }
 

@@ -85,11 +85,19 @@ class DependencyChecker {
    */
   void printDependences();
 
-  // TODO
+ /* Returns a vector of strings of dependences all of a certain kind (depType).
+  * Useful for if a program wants to use this class to find out and report
+  * dependences, without providing it direct access to the internal data
+  * representation.
+  */
   vector<string> getStringDependences(DependenceType depType);
 
-  // TODO
+ /* Given an index of an instruction, returns the index of the most recent
+  * instruction, if any, that had a dependence of depType with it. Returns
+  * -1 otherwise.
+  */ 
   int getPrevDep(int i, DependenceType depType);
+
 
  private:
   /* Determines if a read data dependence occurs when reg is read by the current
@@ -110,8 +118,6 @@ class DependencyChecker {
   OpcodeTable myOpcodeTable;
   map<int, list<Dependence> > myDependenceMap;
 
-  // int myCurrentInstr; // private variable to keep track of instruction
-                      // number of current instruction being checked
 };
 
 
