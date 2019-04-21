@@ -65,19 +65,37 @@ class Pipeline{
 
 
  protected:
-  
-    //vector<pair<Instruction, PipelineStages> > myPipeline;
+ 
+   /* a private container to hold pipeline data. for each instruction denoted
+    * by its index in myInstructions, enocdes the stage it is in, if currently
+    * being executed in the pipeline. Any instruction in this container is
+    * either in the pipeline or has finished executing (i.e., in stage NUM_STAGES) 
+    */
     map<int, PipelineStages> myPipeline;
-    void stepPipeline();
-    virtual bool checkHazards(int i) { return false; };
-    virtual bool checkControlDelay(int i) { return false; };
-    virtual bool checkStallDelay(int i, int prev) { return false; };
-   /* Given the index of an instruction, i, computes and returns the
-    * delay in number of additional stall cycles that instruction will encounter
-    * according to the current model. defaults to 0 for ideal pipeline.
-    * Intended to be overriden to whatever model of pipeline is being implemented
+   
+   /* A method that increments the current clock tick by 1 and updates the
+    * stages of instructions in the pipeline wherever possible. calls checkHazards
+    * before moving any particular instruction into the next stage 
     */ 
-   //TODO 
+    void stepPipeline();
+
+   /* Given the index of an instruction, i, determine if there is any kind of hazard
+    * at all that might prevent this instruction from moving into the next stage
+    * in the pipeline at the current state. Is declared as virtual so that any derived
+    * classes may add their own criteria for what might cause delay 
+    */ 
+    virtual bool checkHazards(int i);
+    
+   /* check if a control delay exists, caused by not doing branch-prediction with
+    * control instructions. for an ideal pipeline, defaults to false.
+    */ 
+    virtual bool checkControlDelay(int i) { return false; };
+    
+   /* check if a data hazard-related stall exists. defaults to false.
+    */ 
+    virtual bool checkStallDelay(int i) { return false; };
+
+    
    /* Internal instance of the DependencyChecker class to find out and query
     * dependences between instructions.
     */ 
@@ -85,7 +103,7 @@ class Pipeline{
 
    /* Internal instance of the OpcodeTable class
     */
-    OpcodeTable opcodes;
+    OpcodeTable myOpcodes;
 
    /* A clock ticker that keeps track of how far along the CPU has progressed.
     * Is incremented by execute by at least one, or more if intermediate clock

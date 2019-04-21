@@ -47,7 +47,11 @@ class StallPipeline: public Pipeline{
   */
   int getDelay(int i);
 
-  bool checkHazards(int i);
+  bool checkHazards(int i) { return Pipeline::checkHazards(i); };
+  bool checkControlDelay(int i);
+  bool checkStallDelay(int i);
+
+
 
  private:
 
