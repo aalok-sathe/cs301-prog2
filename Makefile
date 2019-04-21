@@ -35,8 +35,11 @@ DataForwardPipeline.o: DataForwardPipeline.h
 exec: PIPESIM
 	./PIPESIM inst.asm
 
-test: clean PIPESIM
+test: PIPESIM
 	./PIPESIM inst.asm | diff -y inst.out -
+
+test2: PIPESIM
+	./PIPESIM inst2.asm | diff -y inst2.out -
 
 clean:
 	/bin/rm -f PIPESIM *.o core

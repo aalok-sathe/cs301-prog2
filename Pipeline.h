@@ -28,6 +28,8 @@ struct ValueSchedule
     PipelineStages required;
     PipelineStages produced;
 
+    ValueSchedule() {};
+
     ValueSchedule(PipelineStages r, PipelineStages p)
     {
         required = r;
@@ -77,9 +79,9 @@ class Pipeline{
 
  protected:
    
-    /*
+    /* TODO
      */ 
-    int getDelay(Instruction i) { return 0; }; 
+    virtual int getDelay(int i) { return 0; }; 
     DependencyChecker myDependencyChecker;
     int myTime;
 
@@ -93,7 +95,7 @@ class Pipeline{
         
         outputStruct()
         {
-            columnHeaders = "Instr#   CompletionTime          Mnemonic";
+            columnHeaders = "Instr# \t CompletionTime \t Mnemonic ";
             footer = "Total time is ";
         }
 

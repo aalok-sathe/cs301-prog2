@@ -248,3 +248,23 @@ vector<string> DependencyChecker::getStringDependences(DependenceType depType)
     return lines;
 
 }
+
+
+int DependencyChecker::getPrevDep(int i, DependenceType depType)
+// TODO
+{
+    list<Dependence> deps = myDependenceMap[i];
+    list<Dependence>::iterator it;
+    bool found = false;
+    for (it = deps.begin(); it != deps.end(); it++) 
+        if (it->dependenceType == depType)
+        {
+            found = true;
+            break;
+        }
+ 
+    if (found)
+        return it->previousInstructionNumber;
+
+    return -1;
+}

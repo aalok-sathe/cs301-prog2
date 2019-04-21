@@ -9,9 +9,7 @@ Pipeline::Pipeline(string inputFile)
     myFormatCorrect = false;
     myOutput.myPipelineType = "IDEAL";
    
-    myDataSchedule.insert(make_pair(ARITHM_I, ValueSchedule(EXECUTE, EXECUTE))); 
-    myDataSchedule.insert(make_pair(MEMORY_I, ValueSchedule(EXECUTE, MEMORY))); 
-    myDataSchedule.insert(make_pair(CONTROL_I, ValueSchedule(DECODE, DECODE))); 
+     
 
     Parser* parser;
     string ext = inputFile.substr(inputFile.find_last_of('.')+1);
@@ -48,8 +46,11 @@ void Pipeline::execute()
 // TODO
 {
     for (unsigned int i=0; i<myInstructions.size(); i++)
-        myCompletionTimes.push_back((myTime++) + getDelay(myInstructions.at(i)));
-    
+    {
+        myCompletionTimes.push_back((myTime++) + getDelay(i));
+        if (myTime <= myCompletionTimes.back())
+            myTime = myCompletionTimes.back() + 1;
+    }
 }
 
 
@@ -57,7 +58,7 @@ void Pipeline::print()
 // TODO
 {
     // print out the type of pipeline
-    cout << myOutput.myPipelineType << ':' << endl;
+    cout << myOutput.myPipelineType << ": " << endl;
    
     // print out any dependences found 
     vector<string> deps = myDependencyChecker.getStringDependences(RAW);

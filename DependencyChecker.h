@@ -88,6 +88,8 @@ class DependencyChecker {
   // TODO
   vector<string> getStringDependences(DependenceType depType);
 
+  // TODO
+  int getPrevDep(int i, DependenceType depType);
 
  private:
   /* Determines if a read data dependence occurs when reg is read by the current

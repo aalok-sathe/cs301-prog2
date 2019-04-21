@@ -21,6 +21,8 @@
  * the instructions from the file.
  */
 class DataForwardPipeline: public Pipeline{
+ 
+
  public:
 
   /* The constructor is passed either the name of a MIPS assembly file or
@@ -37,6 +39,9 @@ class DataForwardPipeline: public Pipeline{
    */
   void execute();
 
+ protected:
+
+  int getDelay(int i);
 
 };
 
