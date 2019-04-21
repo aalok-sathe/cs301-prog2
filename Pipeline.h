@@ -65,14 +65,19 @@ class Pipeline{
 
 
  protected:
-   
+  
+    //vector<pair<Instruction, PipelineStages> > myPipeline;
+    map<int, PipelineStages> myPipeline;
+    void stepPipeline();
+    virtual bool checkHazards(int i) { return false; };
+    virtual bool checkControlDelay(int i) { return false; };
+    virtual bool checkStallDelay(int i, int prev) { return false; };
    /* Given the index of an instruction, i, computes and returns the
     * delay in number of additional stall cycles that instruction will encounter
     * according to the current model. defaults to 0 for ideal pipeline.
     * Intended to be overriden to whatever model of pipeline is being implemented
     */ 
-    virtual int getDelay(int i) { return 0; }; 
-    
+   //TODO 
    /* Internal instance of the DependencyChecker class to find out and query
     * dependences between instructions.
     */ 

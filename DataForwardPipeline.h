@@ -47,6 +47,7 @@ class DataForwardPipeline: public Pipeline{
    */
   int getDelay(int i);
 
+  bool checkHazards(int i);
 
  private:
 
