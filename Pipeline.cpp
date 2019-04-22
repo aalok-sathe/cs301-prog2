@@ -1,6 +1,16 @@
 #include "Pipeline.h"
 
 
+void printMap(map<int, PipelineStages> m, int n, int time)
+{
+    for (int i=0; i<n; i++)
+        if (m.find(i) != m.end())
+            cout << i << " is in stage " << m[i]
+                 << " at time " << time << endl;
+            cout << FETCH << endl;
+}
+
+
 Pipeline::Pipeline(string inputFile)
 /* Default constructor for the Pipeline class. Given an input string for
  * a filename, calls an appropriate parser instance on the file (according
@@ -90,6 +100,7 @@ void Pipeline::execute()
 
         // increment clock tick
         myTime++;
+
     }
 }
 
@@ -152,8 +163,10 @@ void Pipeline::stepPipeline()
         // instruction has moved onto the next stage, and if no hazards exist;
         // otherwise stall this instruction in this clock tick
         if ((myPipeline[i]+1 < prevStage or myPipeline[i]+1 == NUM_STAGES)
-            and not checkHazards(i))
-            myPipeline[i] = (PipelineStages) (myPipeline[i] + 1);
+            and (not checkHazards(i)))
+        {
+            myPipeline[i] = (PipelineStages) ((int)myPipeline[i] + 1);
+        }
         else
             continue;
     }

@@ -48,7 +48,7 @@ bool StallPipeline::checkStallDelay(int i)
     // see if there's any RAW dependency of this instruction on a prior instruction
     // and if so, check for potential data hazard stalls required. 
     int prev = myDependencyChecker.getPrevDep(i, RAW);
-    if (prev>0 and myPipeline[i]+1 == reqd)
+    if (prev>=0 and myPipeline[i] == reqd)
     {
         Instruction depInst = myInstructions.at(prev);
         InstFunc depFunc = myOpcodes.getInstFunc(depInst.getOpcode());
@@ -56,12 +56,17 @@ bool StallPipeline::checkStallDelay(int i)
 
         // no delay if value is needed after it is produced
         // for StallPipeline, the W and D stages may overlap
-        if (myPipeline[prev] >= prod)
+        if (myPipeline[prev] > prod)
+        {   
             return false;
+        }
         else
+        {
             return true;
+        }
     }
     
     return false;
 }
+
 
