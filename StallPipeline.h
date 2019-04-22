@@ -50,12 +50,13 @@ class StallPipeline: public Pipeline{
 
  /* control instructions need an extra delay slot because branch prediction
   * is not implemented, so if the previous instruction was a control instruction,
-  * then add one more stall cycle
+  * then add one more stall cycle. return if stall is needed (true) or not (false)
   */
   bool checkControlDelay(int i);
   
 
- /* check if a data hazard-related stall exists.
+ /* check if a data hazard-related stall exists. return if stall is needed (true)
+  * or not (false)
   */
   bool checkStallDelay(int i);
 

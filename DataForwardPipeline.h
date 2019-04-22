@@ -43,13 +43,14 @@ class DataForwardPipeline: public Pipeline{
  
  /* control instructions need an extra delay slot because branch prediction
   * is not implemented, so if the previous instruction was a control instruction,
-  * then add one more stall cycle
+  * then add one more stall cycle. return if such stall is needed or not.
   */
   bool checkControlDelay(int i);
 
  /* check if a data hazard-related stall exists. According to our knowledge of where
   * data is produced and where it is needed (myDataSchedule), tries to do full data
-  * forwarding where possible, but stalls if it must.
+  * forwarding where possible, but stalls if it must. return if stall is required
+  * or not
   */
   bool checkStallDelay(int i);
 

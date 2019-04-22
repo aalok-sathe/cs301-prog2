@@ -20,7 +20,7 @@ StallPipeline::StallPipeline(string inputFile)
 bool StallPipeline::checkControlDelay(int i)
 /* control instructions need an extra delay slot because branch prediction
  * is not implemented, so if the previous instruction was a control instruction,
- * then add one more stall cycle
+ * then add one more stall cycle. returns whether stall is needed.
  */
 {
     if (i > 0)
@@ -38,7 +38,7 @@ bool StallPipeline::checkControlDelay(int i)
 bool StallPipeline::checkStallDelay(int i)
 /* check if a data hazard-related stall exists. Assumes whatever stage the data is
  * produced in (usually WRITEBACK) can write it and the DECODE stage can read it in
- * the same cycle
+ * the same cycle. returns whether stall is needed (true) or not (false)
  */
 {
     // get the current instruction, its function, and when its data is needed
