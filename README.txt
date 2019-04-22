@@ -5,12 +5,15 @@ what:   cs301-prog2
 Testing
 ---
 
-1: extra1.asm
+1. extra1.asm
     in this file, there's an obvious dependence in the first
     two instructions. this should cause a stall. furthermore,
     the first value doesn't become available until after the
     memory stage so the second instruction has to at least
     stall one additional cycle.
+    this file demonstrates that there's a shorter stall after
+    arithmetic instr rather than memory instr in data forward
+    pipeline simply because the value becomes available earlier.
     this file tests the behavior of stall after control
     instructions, and expects a stall after the jump instruction.
     this file also has a two-away dependence between inst#4
