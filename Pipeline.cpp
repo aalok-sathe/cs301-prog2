@@ -1,16 +1,6 @@
 #include "Pipeline.h"
 
 
-void printMap(map<int, PipelineStages> m, int n, int time)
-{
-    for (int i=0; i<n; i++)
-        if (m.find(i) != m.end())
-            cout << i << " is in stage " << m[i]
-                 << " at time " << time << endl;
-            cout << FETCH << endl;
-}
-
-
 Pipeline::Pipeline(string inputFile)
 /* Default constructor for the Pipeline class. Given an input string for
  * a filename, calls an appropriate parser instance on the file (according
