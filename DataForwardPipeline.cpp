@@ -14,7 +14,7 @@ DataForwardPipeline::DataForwardPipeline(string inputFile)
     // earliest can they be forwarded. 
     myDataSchedule.insert(make_pair(ARITHM_I, ValueSchedule(EXECUTE, EXECUTE))); 
     myDataSchedule.insert(make_pair(MEMORY_I, ValueSchedule(EXECUTE, MEMORY))); 
-    myDataSchedule.insert(make_pair(CONTROL_I, ValueSchedule(EXECUTE, WRITEBACK)));
+    myDataSchedule.insert(make_pair(CONTROL_I, ValueSchedule(EXECUTE, EXECUTE)));
 }
 
 

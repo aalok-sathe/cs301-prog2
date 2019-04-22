@@ -51,11 +51,17 @@ void DependencyChecker::addInstruction(Instruction i)
             // check for validity of each register position
             // and process according to known roles (src or dest).
             // dest registers are written to, and source, read from.
+            if (not(myOpcodeTable.isIMMLabel(opc)))
+            {
+                if (myOpcodeTable.RTposition(opc) >= 0) // dest
+                    checkForWriteDependence(i.getRT());
+            }
+            else
+                if (myOpcodeTable.RTposition(opc) >= 0) // src
+                    checkForReadDependence(i.getRT());
             if (myOpcodeTable.RSposition(opc) >= 0) // src
                 checkForReadDependence(i.getRS());
-            if (myOpcodeTable.RTposition(opc) >= 0) // dest
-                checkForWriteDependence(i.getRT());
-
+            
             break;
 
         }
