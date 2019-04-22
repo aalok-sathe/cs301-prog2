@@ -1,0 +1,71 @@
+DESIGN DOCUMENT
+programming assignment 2
+aalok sathe
+
+
+Overview
+---
+This program takes in as its input the name of a file as a command line
+argument. The file may be either an MIPS assembly instructions file or a
+machine language instructions file. The program infers the file format based on
+the extension. If the file format is valid, i.e., it has no illegal characters,
+all instructions are valid, and supported MIPS instructions, then the program
+simulates running the set of instructions in a pipeline. The program
+conducts this process for each of the kinds of pipeline models available
+(ideal, stalling, or dataforwarding); the program prints any detected RAW
+dependencies and the execution completion times for each instruction in each
+kind of pipeline.
+
+
+Structure
+---
+This program consists of several classes---Parser, ASMParser, MachLangParser,
+Instruction, OpcodeTable, RegisterTable, DependencyChecker, Pipeline,
+StallPipeline, DataForwardPipeline---and one driver file called Pipesim.cpp.
+The classes ASMParser and MachLangParser inherit from Parser as a base class.
+The classes StallPipeline and DataForwardPipeline inherit from Pipeline as
+their base class.
+
+
+Description
+---
+* Parser, ASMParser, MachLangParser: The class Parser serves as an interface to
+  implement various kinds of parsers, here specific parsers for either assembly
+  instructions or machine language instructions. The Parser interface
+  constructs an object by accepting the name of an input file. It scans the
+  input file and tries to parse each line to extract an underlying Instruction.
+  In case of trouble parsing, it reports that the file format is incorrect.
+* Instruction, OpcodeTable, RegisterTable: This is a suit of files helpful for
+  creating an underlying representation of instructions, after having parsed
+  a file. The OpcodeTable class stores information about kinds of instructions,
+  their operands, and opcodes.
+* DependencyChecker: This class is useful to detect data hazards and dependencies
+  in a sequence of instructions. It supports adding an instruction, and will
+  find out any dependencies of that instruction with the existing instructions.
+  It has public methods to query if a particular instruction has a certain kind
+  of dependency. This is particularly useful in finding out RAW dependencies in
+  pipelining.
+* Pipeline: This is a base class that simulates an ideal pipeline with no
+  stalling, by assuming there would be no data hazards or control delays. The
+  class implements machinery, however, to accommodate data and control induced
+  stalls by providing virtual methods that can be overriden by whatever kind of
+  model is being implemented. StallPipeline: This class simulates stalling
+  behavior by waiting until values are written to decode them (however, in the
+  same cycle).
+
+
+Organization
+The ASM.cpp file organizes these classes in the following manner. The ASM file passes the
+name of a MIPS file supplied by command line arguments to the ASMParser class. The
+ASMParser class will check that the file is syntactically correct. In order to check the syntactical
+correctness of each line in the file, the ASMParser class contains instances of the OpcodeTable
+class and the RegisterTable class. The RegisterTable class is used to determine if only valid
+register names are specified while the OpcodeTable is used to determine if the fields specified in
+the line are correct for the specified instruction mnemonic. If the file is syntactically correct, the
+ASMParser will retain a list of Instruction instances for each line in the input file. The fields of
+each Instruction instance are determined from the text line by using the OpcodeTable to
+determine the values for the different instruction components and the the RegisterTable to
+determine the numerical value corresponding to each register name in the instruction.
+
+Once the syntactic correctness of the input file has been determined, ASM.cpp iterates through
+the instructions in ASMParser, printing the binary encoding of each instruction to stdout.
