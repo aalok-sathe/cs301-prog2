@@ -41,5 +41,8 @@ test: PIPESIM
 test2: PIPESIM
 	./PIPESIM inst2.asm | diff -y inst2.out -
 
+turnin: clean
+	turnin -v -c cs301 -p prog2 *
+
 clean:
 	/bin/rm -f PIPESIM *.o core
