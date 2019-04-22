@@ -33,3 +33,11 @@ Testing
     one, and causes additional stall in the StallPipeline.
     however, data forwarding is able to avoid that stall.
     expected output: ideal 10, stalling 16, dataforward 11.
+
+3. extra3.asm
+    this file serves to demonstrate how execution times on the
+    pipeline models can differ drastically: 15, 25, 17.
+
+4. extra4.mach
+    this file serves to test whether the program can successfully
+    take machine language files as input as well.
