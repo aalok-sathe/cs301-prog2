@@ -65,6 +65,27 @@ Description
   object's print method.
 
 
+New methods
+---
+* DependencyChecker::getPrevDep(int i, Dependence depType)
+    takes in the index of an instruction, i, and a dependence type depType
+    that is queried, and determines if there was a previous instruction
+    causing dependence of depType with i. returns that index if any, else -1.
+* Pipeline::stepPipeline()
+    internal method that advances pipeline simulation by one clock tick.
+    advances instructions in an internal pipeline map if possible. breaks
+    when encountered an instruction not yet in the pipeline.
+* Pipeline::checkHazards(int i)
+    given an instruction index i, determines if, according to current state,
+    there are any hazards that would require stalling the instruction.
+    includes calls to checking control hazard and data hazard stall by
+    default, however, in ideal pipeline it defaults to no stall.
+* Pipeline::{checkControlDelay, checkStallDelay}(int i)
+    these two methods are defined in pipeline to make it easy for derived
+    classes to override them and plug-and-play. they determine the particular
+    kinds of stall induced by pipeline model. these methods have their own
+    implementation in StallPipeline and DataForwardPipeline classes.
+
 Organization
 ---
 The Pipesim.cpp file organizes these classes as so: The Pipesim file passes
