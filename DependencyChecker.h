@@ -116,7 +116,8 @@ class DependencyChecker {
   list<Dependence> myDependences;
   vector<Instruction> myInstructions;
   OpcodeTable myOpcodeTable;
-  map<int, list<Dependence> > myDependenceMap;
+  map<int, list<Dependence> > myDependenceMap; // stores all dependences of a particular
+                                               // instruction given by instr index 
 
 };
 

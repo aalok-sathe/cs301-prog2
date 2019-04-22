@@ -18,50 +18,12 @@ DataForwardPipeline::DataForwardPipeline(string inputFile)
 }
 
 
-int DataForwardPipeline::getDelay(int i)
-/* Given the index of an instruction, i, computes and returns the
- * delay in number of additional stall cycles that instruction will encounter
- * according to the current model
+bool DataForwardPipeline::checkControlDelay(int i)
+ /* control instructions need an extra delay slot because branch prediction
+ * is not implemented, so if the previous instruction was a control instruction,
+ * then add one more stall cycle
  */
 {
-    Instruction curInst = myInstructions.at(i);
-    InstFunc curFunc = myOpcodes.getInstFunc(curInst.getOpcode());
-    PipelineStages reqd = myDataSchedule[curFunc].required;
-
-    // control instructions need an extra delay slot because branch prediction
-    // is not implemented
-    if (curFunc == CONTROL_I)
-       myTime++; 
- 
-    // see if there's any RAW dependency of this instruction on a prior instruction
-    // and if so, check for potential data hazard stalls required.   
-    int prev = myDependencyChecker.getPrevDep(i, RAW);
-    if (prev>0)
-    {
-        Instruction depInst = myInstructions.at(prev);
-        InstFunc depFunc = myOpcodes.getInstFunc(depInst.getOpcode());
-        PipelineStages prod = myDataSchedule[depFunc].produced;
-
-        // no delay if value is needed after it is produced
-        if ((int)reqd > (int)prod)
-            return 0;
-
-        // the amount of time to wait till the data forwarding machinery
-        // can line up
-        return prod - reqd;
-    }
-   
-    // if no data hazard exists, no additional delay is necessary 
-    return 0;
-}
-
-
-bool DataForwardPipeline::checkControlDelay(int i)
-    // TODO
-{
-    // control instructions need an extra delay slot because branch prediction
-    // is not implemented, so if the previous instruction was a control instruction,
-    // then add one more stall cycle
     if (i > 0)
     {
         Instruction prevInst = myInstructions.at(i-1);
@@ -75,7 +37,10 @@ bool DataForwardPipeline::checkControlDelay(int i)
 
 
 bool DataForwardPipeline::checkStallDelay(int i)
-    // TODO
+/* check if a data hazard-related stall exists. According to our knowledge of where
+ * data is produced and where it is needed (myDataSchedule), tries to do full data
+ * forwarding where possible, but stalls if it must.
+ */
 {
     // get the current instruction, its function, and when its data is needed
     Instruction curInst = myInstructions.at(i);
