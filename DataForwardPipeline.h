@@ -38,7 +38,7 @@ class DataForwardPipeline: public Pipeline{
  /* Although Pipeline::checkHazards is virtual, reuse it here since no
   * modiciation is necessary for this pipeline model
   */
-  using Pipeline::checkHazards;
+  bool checkHazards(int i);
 
  
  /* control instructions need an extra delay slot because branch prediction
@@ -53,7 +53,6 @@ class DataForwardPipeline: public Pipeline{
   * or not
   */
   bool checkStallDelay(int i);
-
 
 };
 

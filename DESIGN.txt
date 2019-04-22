@@ -48,15 +48,18 @@ Description
   pipelining.
 * Pipeline: This is a base class that simulates an ideal pipeline with no
   stalling, by assuming there would be no data hazards or control delays. The
-  class implements machinery, however, to accommodate data and control induced
-  stalls by providing virtual methods that can be overriden by whatever kind of
+  class implements skeleton machinery to allow for any stalls, by providing a
+  virtual methods that can be overriden by whatever kind of derived
   model is being implemented. StallPipeline: This class simulates stalling
   behavior by waiting until values are written to decode them (however, in the
-  same cycle). The class inherits most of its functionality from Pipeline, and
-  reuses the same method to check for any potential hazards, since no additional
-  functionality needs to be implemented. DataForwardPipeline: This class
-  simulates full DataForwarding between intermediate stages of the pipeline,
-  to minimize the amount of stalling required.
+  same cycle). The class inherits most of its functionality from Pipeline. It
+  overrides the checkHazards method to stall if a datahazard-based dependency
+  is found and values are not available. the class also implements stalling
+  one cycle after control instructions since branch prediction is not in place.
+  DataForwardPipeline: This class simulates full DataForwarding between 
+  intermediate stages of the pipeline, to minimize the amount of stalling 
+  required. it implements the stall hazard check method to only stall if even
+  after forwarding the data would not be available.
 * Pipesim: This is the driver file of the program. It initializes an object
   corresponding to each of the three kinds of pipelines, i.e., ideal, stalling,
   and dataforwarding. For each one of them, it passes the filename as input
@@ -80,11 +83,11 @@ New methods
     there are any hazards that would require stalling the instruction.
     includes calls to checking control hazard and data hazard stall by
     default, however, in ideal pipeline it defaults to no stall.
-* Pipeline::{checkControlDelay, checkStallDelay}(int i)
-    these two methods are defined in pipeline to make it easy for derived
-    classes to override them and plug-and-play. they determine the particular
-    kinds of stall induced by pipeline model. these methods have their own
-    implementation in StallPipeline and DataForwardPipeline classes.
+* {StallPipeline, DataForwardPipeline}::{checkControlDelay, checkStallDelay}(int i)
+    these two methods are defined in derived pipeline classes to determine
+    the particular kinds of stall induced by those pipeline models. these methods
+    have their own implementation in StallPipeline and DataForwardPipeline
+    classes and reflect when data becomes available in each of those.
 
 Organization
 ---

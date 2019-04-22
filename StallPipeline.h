@@ -38,14 +38,7 @@ class StallPipeline: public Pipeline{
  /* Although Pipeline::checkHazards is virtual, reuse it here since no
   * modiciation is necessary for this pipeline model
   */
-  using Pipeline::checkHazards;
-
-
- /* Given the index of an instruction, i, computes and returns the
-  * delay in number of additional stall cycles that instruction will encounter
-  * according to the current model.
-  */
-  int getDelay(int i);
+  bool checkHazards(int i);
 
 
  /* control instructions need an extra delay slot because branch prediction

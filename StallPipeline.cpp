@@ -17,6 +17,30 @@ StallPipeline::StallPipeline(string inputFile)
 }
 
 
+bool StallPipeline::checkHazards(int i)
+/* Given the index of an instruction, i, determine if there is any kind of hazard
+ * at all that might prevent this instruction from moving into the next stage
+ * in the pipeline at the current state 
+ */
+{
+    // control instructions may need an extra delay slot because branch prediction
+    // is not implemented, so if the previous instruction was a control instruction,
+    // then may need add one more stall cycle. depends on the pipeline model.
+    // for ideal, no control delay exists.
+    if (checkControlDelay(i))
+        return true;
+    
+    // see if there's any RAW dependency of this instruction on a prior instruction
+    // and if so, check for potential data hazard stalls required. for ideal, no
+    // dependencies exist.
+    if (checkStallDelay(i))
+        return true;
+    
+    // if no data hazard exists, no additional delay is necessary 
+    return false;
+}
+
+
 bool StallPipeline::checkControlDelay(int i)
 /* control instructions need an extra delay slot because branch prediction
  * is not implemented, so if the previous instruction was a control instruction,

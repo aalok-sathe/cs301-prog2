@@ -78,25 +78,13 @@ class Pipeline{
 
    /* Given the index of an instruction, i, determine if there is any kind of hazard
     * at all that might prevent this instruction from moving into the next stage
-    * in the pipeline at the current state. Is declared as virtual so that any derived
+    * in the pipeline at the current state. is declared as virtual so that any derived
     * classes may add their own criteria for what might cause delay. returns whether
     * stall is needed because hazards exist (true) or not (false) 
     */ 
-    virtual bool checkHazards(int i);
-    
+    virtual bool checkHazards(int i) { return false; };
 
-    /* check if a control delay exists, caused by not doing branch-prediction with
-    * control instructions. for an ideal pipeline, defaults to false for an ideal model.
-    */ 
-    virtual bool checkControlDelay(int i) { return false; };
- 
 
-   /* check if a data hazard-related stall exists. defaults to false for an ideal model.
-    * returns whether stall is needed (true) or not (false)
-    */ 
-    virtual bool checkStallDelay(int i) { return false; };
-
-    
    /* Internal instance of the DependencyChecker class to find out and query
     * dependences between instructions.
     */ 
