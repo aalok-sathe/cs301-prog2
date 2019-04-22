@@ -31,16 +31,15 @@ class StallPipeline: public Pipeline{
    */
   StallPipeline(string inputFile);
 
-  /* Executes the instructions passed into the constructor.  The method
-   * determines the dependences and calculates the completion time of each
-   * instruction and the overall execution time for the set of instructions,
-   * storing that information for later printing.
-   */
-  void execute();
 
-
- protected:
+ private:
  
+ /* Although Pipeline::checkHazards is virtual, reuse it here since no
+  * modiciation is necessary for this pipeline model
+  */
+  using Pipeline::checkHazards;
+
+
  /* Given the index of an instruction, i, computes and returns the
   * delay in number of additional stall cycles that instruction will encounter
   * according to the current model.
@@ -48,7 +47,17 @@ class StallPipeline: public Pipeline{
   int getDelay(int i);
 
 
- private:
+ /* control instructions need an extra delay slot because branch prediction
+  * is not implemented, so if the previous instruction was a control instruction,
+  * then add one more stall cycle
+  */
+  bool checkControlDelay(int i);
+  
+
+ /* check if a data hazard-related stall exists.
+  */
+  bool checkStallDelay(int i);
+
 
 };
 

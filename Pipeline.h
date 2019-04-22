@@ -65,28 +65,45 @@ class Pipeline{
 
 
  protected:
+ 
+
+  /* a private container to hold pipeline data. for each instruction denoted
+    * by its index in myInstructions, enocdes the stage it is in, if currently
+    * being executed in the pipeline. Any instruction in this container is
+    * either in the pipeline or has finished executing (i.e., in stage NUM_STAGES) 
+    */
+    map<int, PipelineStages> myPipeline;
    
-   /* Given the index of an instruction, i, computes and returns the
-    * delay in number of additional stall cycles that instruction will encounter
-    * according to the current model. defaults to 0 for ideal pipeline.
-    * Intended to be overriden to whatever model of pipeline is being implemented
+
+   /* Given the index of an instruction, i, determine if there is any kind of hazard
+    * at all that might prevent this instruction from moving into the next stage
+    * in the pipeline at the current state. Is declared as virtual so that any derived
+    * classes may add their own criteria for what might cause delay 
     */ 
-    virtual int getDelay(int i) { return 0; }; 
+    virtual bool checkHazards(int i);
+    
+
+    /* check if a control delay exists, caused by not doing branch-prediction with
+    * control instructions. for an ideal pipeline, defaults to false for an ideal model.
+    */ 
+    virtual bool checkControlDelay(int i) { return false; };
+ 
+
+   /* check if a data hazard-related stall exists. defaults to false for an ideal model.
+    */ 
+    virtual bool checkStallDelay(int i) { return false; };
+
     
    /* Internal instance of the DependencyChecker class to find out and query
     * dependences between instructions.
     */ 
     DependencyChecker myDependencyChecker;
 
+ 
    /* Internal instance of the OpcodeTable class
     */
-    OpcodeTable opcodes;
+    OpcodeTable myOpcodes;
 
-   /* A clock ticker that keeps track of how far along the CPU has progressed.
-    * Is incremented by execute by at least one, or more if intermediate clock
-    * ticks may be skipped (relevant to other kinds of pipeline models).
-    */
-    int myTime;
 
    /* An internal struct to hold data that is computed for later
     * formatting and printing.
@@ -109,18 +126,14 @@ class Pipeline{
 
     } myOutput;
 
-   /* Internal variable to keep track of whether or not the input files are
-    * correctly formatted. Takes its value from whichever parser is used to
-    * parse the input file.
-    */
-    bool myFormatCorrect;
 
    /* A container to store the instructions in the pipeline.
     * The container is ordered, and relies on instruction indices for certain
     * kinds of processing.
     */
     vector<Instruction> myInstructions;
-    
+   
+
    /* A container to store when each of the instructions would finish executing
     * according to the current pipeline model. The stored information may be used
     * later in outputting the data.
@@ -150,13 +163,36 @@ class Pipeline{
    /* A map that stores information pertaining to each kind of instruction
     * (arithmetic/memory/control) regarding when its operands to operate on (if any)
     * are needed and when its output (if any) is produced. This information is stored
-    * using a ValueSchedule structure, with two data fields: 'required' and 'produced'
+    * using a ValueSchedule structure, with two data fields: 'required' and 'produced'.
+    * This structure is housed in the Pipeline class since the design of the pipeline
+    * determines how and when computation of certain values occurs.
     */
     map<InstFunc, ValueSchedule> myDataSchedule;
 
+
  private:
 
-    
+
+    /* A method that increments the current clock tick by 1 and updates the
+    * stages of instructions in the pipeline wherever possible. calls checkHazards
+    * before moving any particular instruction into the next stage 
+    */ 
+    void stepPipeline();
+ 
+
+    /* Internal variable to keep track of whether or not the input files are
+    * correctly formatted. Takes its value from whichever parser is used to
+    * parse the input file.
+    */
+    bool myFormatCorrect;
+
+
+   /* A clock ticker that keeps track of how far along the CPU has progressed.
+    * Is incremented by execute by at least one, or more if intermediate clock
+    * ticks may be skipped (relevant to other kinds of pipeline models).
+    */
+    int myTime;
+
 };
 
 #endif
