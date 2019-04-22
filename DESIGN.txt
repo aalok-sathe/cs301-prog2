@@ -1,6 +1,7 @@
-DESIGN DOCUMENT
-programming assignment 2
-aalok sathe
+ DESIGN DOCUMENT
+ cs301: prog2
+ ---
+ aalok sathe
 
 
 Overview
@@ -51,21 +52,99 @@ Description
   stalls by providing virtual methods that can be overriden by whatever kind of
   model is being implemented. StallPipeline: This class simulates stalling
   behavior by waiting until values are written to decode them (however, in the
-  same cycle).
+  same cycle). The class inherits most of its functionality from Pipeline, and
+  reuses the same method to check for any potential hazards, since no additional
+  functionality needs to be implemented. DataForwardPipeline: This class
+  simulates full DataForwarding between intermediate stages of the pipeline,
+  to minimize the amount of stalling required.
+* Pipesim: This is the driver file of the program. It initializes an object
+  corresponding to each of the three kinds of pipelines, i.e., ideal, stalling,
+  and dataforwarding. For each one of them, it passes the filename as input
+  for these objects to intialize, calls the execute method to simulate the
+  pipelines, and then asks to print out the information using each pipeline
+  object's print method.
 
 
 Organization
-The ASM.cpp file organizes these classes in the following manner. The ASM file passes the
-name of a MIPS file supplied by command line arguments to the ASMParser class. The
-ASMParser class will check that the file is syntactically correct. In order to check the syntactical
-correctness of each line in the file, the ASMParser class contains instances of the OpcodeTable
-class and the RegisterTable class. The RegisterTable class is used to determine if only valid
-register names are specified while the OpcodeTable is used to determine if the fields specified in
-the line are correct for the specified instruction mnemonic. If the file is syntactically correct, the
-ASMParser will retain a list of Instruction instances for each line in the input file. The fields of
-each Instruction instance are determined from the text line by using the OpcodeTable to
-determine the values for the different instruction components and the the RegisterTable to
-determine the numerical value corresponding to each register name in the instruction.
+---
+The Pipesim.cpp file organizes these classes as so: The Pipesim file passes
+the name of the file it receives as input to each of the three pipeline classes,
+i.e., ideal, stalling, dataforwarding. The input file can be either a MIPS assembly
+instructions file or assembled MIPS binary instructions file. The driver fill will
+rely on these classes to make sure it is correctly formatted, all of whom will in
+turn use either the ASMParser class or the MachLangParser class to determine the
+validity of the file and instructions in it, and to actually parse and return
+representations of those instructions using the Instruction class. The derived Parser
+instances, ASMParser and MachLangParser have their internal instances of OpcodeTable
+class to determine how to represent an instruction.
+The Pipeline class and derived classes store instructions received from the parser
+and use an instance of DependencyChecker to detect any dependences that might exist
+within the sequence of instructions. If there are RAW dependences, they are noted down
+for printing using the print() method. The Pipeline class simulates execution of
+the sequence of instructions in a pipeline, with added constraints to guide the
+pace of execution and necessary stalls. The Pipeline class has a structure to encode
+data about when certain values would be available in particular instructions (such
+as, the values produced by an arithmetic instruction would become available in the
+execute stage). The Pipeline classes map each of the three major instruction types
+(arithmetic, memory, control) to the times when their values would be needed and
+the produced values would become available (if any). This structure is not so
+relevant to the ideal pipeline. In the stall pipeline, it is assumed that for all
+kinds of instructions, values become available in writeback and are needed during
+decode (and these two stages can overlap). 
+The Pipeline class simulates the ideal case, and so has no added constraints. The
+derived classes both have constraints that add to the execution time. The 
+StallPipeline uses the instance of DependencyChecker for each instruction to find 
+out if it had a RAW dependence with any of its previous instructions. If so, the 
+class simulates stalling to wait until the required value is available, in the 
+writeback stage, and alows the decode stage of the the current instruction to 
+progress forward in the same stage. The DataForwardPipeline class has a very 
+similar design, except it doesn't allow data forwarding within the same stage,
+and encodes its own data production and requirement values in the DataSchedule
+instance.
+The Pipesim.cpp file calls print methods of each of these pipelines to print out
+the execution result and completion times of each of the instructions, as well as
+a list of dependences.
 
-Once the syntactic correctness of the input file has been determined, ASM.cpp iterates through
-the instructions in ASMParser, printing the binary encoding of each instruction to stdout.
+
+Extending functionality
+---
+It is straightforward to implement new functionality with this set of files as
+the base. 
+
+0. Changing architecture:
+The architecture is defined in the derived Parser classes, and affects only the
+parsing of an instruction. It would also need changes in OpcodeTable to represent
+the new lengths of fields, and conversion between two's complement and decimal.
+Once the Parsers are happy with a new architecture, the rest of the program
+doesn't depend on it.
+
+1. Adding a new instruction:
+To add support for new instructions, one can simply modify the
+OpcodeTable class and add another entry in the array as is being done with all
+the rest of the instructions in its constructor. You would have to fill in the
+relevant fields for the instruction for it to be fully supported.
+
+2. Adding new pipeline stage(s):
+The pipeline stages are encoded as an enum, called PipelineStages, in Pipeline.h.
+In order to add a new stage, a new enum member with the name of the stage would
+need to be added to the enum.
+In the DataForwarding and Stall pipeline classes, the constructor has statements
+to add values to a map representing what pipeline stages values of an instruction
+are produced in, and what pipeline stages they are needed in. In case changing
+the pipeline stages changes this, the statements in the derived classes'
+constructors can simply be changed to reflect the new stages.
+
+3. Changing stalling behavior:
+Additional conditions for stalling can be added as additional constraints in the
+checkHazards methods of the derived classes. In order to stall more than just one
+stage for control instructions, a list could be constructed with the list of all
+the stages the control instruction would be in while we stall, and in the
+checkControlDelay method we could check if the current stage of the control
+instruction matches any of the ones from that list.
+
+4. Changing dataforwarding behavior:
+If dataforwarding behavior desired is not 'full data forwarding', but only certain
+kinds of data forwarding is possible, then in the checkStallDelay methods of the
+derived class, with the help of an additional if-statement, it can be verified if
+the previous stage of the instruction to forward from was the one we expect or
+consider acceptable, otherwise a 'true' value could be returned. 
