@@ -74,7 +74,7 @@ void Pipeline::execute()
             myPipeline.insert(make_pair(i, FETCH));
        
         // update clock tick and pipeline stages
-        stepPipeline();
+        stepPipeline(j);
       
         // if instruction at j is finished executing, add the current clock
         // tick as its completion time 
@@ -128,21 +128,26 @@ void Pipeline::print()
 }
 
 
-void Pipeline::stepPipeline()
+void Pipeline::stepPipeline(int current)
 /* A method that increments the clock tick by 1, and makes updates to the
  * pipeline as appropriate. It checks to see if any instructions can finish
  * executing in this clock tick, and if any new instructions can be added.
  * It makes a call to checkHazards, to make sure to stall if any unresovlable
  * hazard is present according to the current pipeline model. 
+ * int current: the integer index of the instruction that is currently the
+ * first instruction in the pipeline (we ignore instructions that have finished
+ * executing).
  */
 {
     // check to see each of the instructions in the pipeline, in order
     // added. if an instruction is not present, then no instructions thereafter
     // are being executed yet so exit. if an instruction has finished executing,
     // its stage would be 'NUM_STAGES', so skip that and move on to next instr
-    for (unsigned int i=0; i<myInstructions.size(); i++)
+    for (unsigned int i=current; i<myInstructions.size(); i++)
     {
-        // if not yet in pipeline, stop updating
+        // if not yet in pipeline, stop updating because we reached end of 
+        // active pipeline and instructions beyond current value are not being
+        // executed yet
         if (myPipeline.find(i) == myPipeline.end())
             break; 
 
@@ -159,7 +164,7 @@ void Pipeline::stepPipeline()
             myPipeline[i] = (PipelineStages) ((int)myPipeline[i] + 1);
         }
         else
-            continue;
+            continue;   // done updating the current instruction 
     }
 }
 

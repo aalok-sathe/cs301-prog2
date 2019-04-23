@@ -167,8 +167,10 @@ class Pipeline{
     /* A method that increments the current clock tick by 1 and updates the
     * stages of instructions in the pipeline wherever possible. calls checkHazards
     * before moving any particular instruction into the next stage 
-    */ 
-    void stepPipeline();
+    * int current: the integer index of the instruction that is currently the
+    * first instruction in the pipeline (we ignore instructions that have finished
+    * executing; i.e. the ones that came befoe 'current'). */ 
+    void stepPipeline(int current);
  
 
     /* Internal variable to keep track of whether or not the input files are

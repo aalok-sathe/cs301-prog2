@@ -52,15 +52,14 @@ void DependencyChecker::addInstruction(Instruction i)
             // check for validity of each register position
             // and process according to known roles (src or dest).
             // dest registers are written to, and source, read from.
-            if (not(myOpcodeTable.isIMMLabel(opc)))
+            if(myOpcodeTable.RTposition(opc) >= 0) // check if RT is being used 
             {
-                if (myOpcodeTable.RTposition(opc) >= 0) // dest
-                    checkForWriteDependence(i.getRT());
+                if (not(myOpcodeTable.isIMMLabel(opc)))
+                    checkForWriteDependence(i.getRT()); // there's no immlabel so dest
+                else
+                    checkForReadDependence(i.getRT());  // immlabel so it's a src
             }
-            else
-                if (myOpcodeTable.RTposition(opc) >= 0) // src
-                    checkForReadDependence(i.getRT());
-            if (myOpcodeTable.RSposition(opc) >= 0) // src
+            if (myOpcodeTable.RSposition(opc) >= 0) // always src, if it exists
                 checkForReadDependence(i.getRS());
             
             break;
@@ -272,19 +271,11 @@ int DependencyChecker::getPrevDep(int i, DependenceType depType)
     // retrieve the list of dependenes of instruction at i
     list<Dependence> deps = myDependenceMap[i];
     list<Dependence>::iterator it;
-    bool found = false; // flag because depType dependence might not exist
 
     // find the depType dependence, if any, and exit
     for (it = deps.begin(); it != deps.end(); it++) 
         if (it->dependenceType == depType)
-        {
-            found = true;
-            break;
-        }
-
-    // return index of instruction that instruction at i has a dep with 
-    if (found)
-        return it->previousInstructionNumber;
+            return it->previousInstructionNumber;
 
     // no dependence of queried type exists
     return -1;

@@ -22,7 +22,7 @@ Testing
     addition to having one instruction in between them.
     finally, the dependence (6,7) should cause stalling in
     the stall pipeline but not in data forwarding.
-    expected output: ideal 12, stalling 20, dataforward 14.
+    expected output: ideal 14, stalling 24, dataforward 16.
 
 2. extra2.asm
     in this file, we test the behavior of beq (branch equals)
